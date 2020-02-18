@@ -96,14 +96,14 @@ chaosexperiment & chaosengine custom resoures are created in the same namespace 
 the same as the namespace of the application under test (AUT).
 </div>
 
-### Install Chaos Experiments
+### Install Chaos Experiments in the Target Application Namespace
 
 Chaos experiments contain the actual chaos details. These experiments are installed on your cluster as Kubernetes CRs (Custom Resources). The Chaos Experiments are grouped as Chaos Charts and are published on <a href=" https://hub.litmuschaos.io" target="_blank">Chaos Hub</a>. 
 
 The generic chaos experiments such as `pod-kill`,  `container-kill`,` network-delay` are available under Generic Chaos Chart. This is the first chart you install. You can later install application specific chaos charts for running application oriented chaos.
 
 ```
-kubectl apply -f https://hub.litmuschaos.io/api/chaos?file=charts/generic/experiments.yaml
+kubectl apply -f https://hub.litmuschaos.io/api/chaos?file=charts/generic/experiments.yaml -n cassandra
 ```
 
 Verify if the chaos experiments are installed.
@@ -163,6 +163,16 @@ Your application has to be annotated with `litmuschaos.io/chaos="true"`. As a se
 
 ```console
 kubectl annotate deploy/nginx litmuschaos.io/chaos="true"
+kubectl annotate pod/cassandra-0 pod/cassandra-1 pod/cassandra-2  litmuschaos.io/chaos="true" -n cassandra
+
+
+kubectl get pod --show-labels -n cassandra
+NAME            READY   STATUS    RESTARTS   AGE    LABELS
+cassandra-0     0/1     Pending   0          5m2s   app=cassandra,controller-revision-hash=cassandra-78bb8c7b85,release=cassandra,statefulset.kubernetes.io/pod-name=cassandra-0
+cassandra-1     1/1     Running   0          79m    app=cassandra,controller-revision-hash=cassandra-78bb8c7b85,release=cassandra,statefulset.kubernetes.io/pod-name=cassandra-1
+cassandra-2     1/1     Running   0          78m    app=cassandra,controller-revision-hash=cassandra-78bb8c7b85,release=cassandra,statefulset.kubernetes.io/pod-name=cassandra-2
+loadgen-rvf5p   1/1     Running   0          6m3s   app=loadgen,controller-uid=0b33dd45-5278-11ea-b8f1-42010a800124,job-name=loadgen
+
 ```
 
 ### Prepare ChaosEngine 
